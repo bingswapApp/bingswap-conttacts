@@ -5,13 +5,13 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./libs/IBEP20.sol";
 import "./libs/SafeBEP20.sol";
-import "./libs/ISailReferral.sol";
+import "./libs/IBingReferral.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "./BingToken.sol";
 
-// MasterChef is the master of Sail. He can make Bing and he is a fair guy.
+// MasterChef is the master of Bing. He can make Bing and he is a fair guy.
 //
 // Note that it's ownable and the owner wields tremendous power. The ownership
 // will be transferred to a governance smart contract once BING is sufficiently
@@ -142,18 +142,18 @@ contract MasterChef is Ownable, ReentrancyGuard {
         return _to.sub(_from).mul(BONUS_MULTIPLIER);
     }
 
-    // View function to see pending SAILs on frontend.
+    // View function to see pending BINGs on frontend.
     function pendingSail(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
-        uint256 accSailPerShare = pool.accSailPerShare;
+        uint256 accBingPerShare = pool.accBingPerShare;
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (block.number > pool.lastRewardBlock && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
             uint256 sailReward = multiplier.mul(sailPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-            accSailPerShare = accSailPerShare.add(sailReward.mul(1e12).div(lpSupply));
+            accBingPerShare = accBingPerShare.add(bingReward.mul(1e12).div(lpSupply));
         }
-        return user.amount.mul(accSailPerShare).div(1e12).sub(user.rewardDebt);
+        return user.amount.mul(accBingPerShare).div(1e12).sub(user.rewardDebt);
     }
 
     // Update reward variables for all pools. Be careful of gas spending!
@@ -176,10 +176,10 @@ contract MasterChef is Ownable, ReentrancyGuard {
             return;
         }
         uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-        uint256 sailReward = multiplier.mul(sailPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-        sail.mint(devAddress, sailReward.div(10));
-        sail.mint(address(this), sailReward);
-        pool.accSailPerShare = pool.accSailPerShare.add(sailReward.mul(1e12).div(lpSupply));
+        uint256 sailReward = multiplier.mul(bingPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+        sail.mint(devAddress, bingReward.div(10));
+        sail.mint(address(this), bingReward);
+        pool.accSailPerShare = pool.accBingPerShare.add(bingReward.mul(1e12).div(lpSupply));
         pool.lastRewardBlock = block.number;
     }
 
