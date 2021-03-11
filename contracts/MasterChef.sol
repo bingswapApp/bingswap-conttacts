@@ -56,7 +56,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
     address public feeAddress;
     // BING tokens created per block.
     uint256 public bingPerBlock;
-    // Bonus muliplier for early sail makers.
+    // Bonus muliplier for early bing makers.
     uint256 public constant BONUS_MULTIPLIER = 1;
 
     // Initial emission rate: 1 BING per block.
@@ -176,10 +176,10 @@ contract MasterChef is Ownable, ReentrancyGuard {
             return;
         }
         uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-        uint256 sailReward = multiplier.mul(bingPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-        sail.mint(devAddress, bingReward.div(10));
-        sail.mint(address(this), bingReward);
-        pool.accSailPerShare = pool.accBingPerShare.add(bingReward.mul(1e12).div(lpSupply));
+        uint256 bingReward = multiplier.mul(bingPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+        bing.mint(devAddress, bingReward.div(10));
+        bing.mint(address(this), bingReward);
+        pool.accBingPerShare = pool.accBingPerShare.add(bingReward.mul(1e12).div(lpSupply));
         pool.lastRewardBlock = block.number;
     }
 
