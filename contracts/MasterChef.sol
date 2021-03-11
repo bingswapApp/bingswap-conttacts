@@ -188,8 +188,8 @@ contract MasterChef is Ownable, ReentrancyGuard {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         updatePool(_pid);
-        if (_amount > 0 && address(sailReferral) != address(0) && _referrer != address(0) && _referrer != msg.sender) {
-            sailReferral.recordReferral(msg.sender, _referrer);
+        if (_amount > 0 && address(bingReferral) != address(0) && _referrer != address(0) && _referrer != msg.sender) {
+            bingReferral.recordReferral(msg.sender, _referrer);
         }
         if (user.amount > 0) {
             uint256 pending = user.amount.mul(pool.accBingPerShare).div(1e12).sub(user.rewardDebt);
@@ -250,7 +250,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
     function safeBingTransfer(address _to, uint256 _amount) internal {
         uint256 bingBal = bing.balanceOf(address(this));
         bool transferSuccess = false;
-        if (_amount > sailBal) {
+        if (_amount > bingBal) {
             transferSuccess = bing.transfer(_to, bingBal);
         } else {
             transferSuccess = bing.transfer(_to, _amount);
@@ -272,7 +272,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
     // Reduce emission rate by 3% every 9,600 blocks ~ 8hours. This function can be called publicly.
     function updateEmissionRate() public {
         require(block.number > startBlock, "updateEmissionRate: Can only be called after mining starts");
-        require(sailPerBlock > MINIMUM_EMISSION_RATE, "updateEmissionRate: Emission rate has reached the minimum threshold");
+        require(bingPerBlock > MINIMUM_EMISSION_RATE, "updateEmissionRate: Emission rate has reached the minimum threshold");
 
         uint256 currentIndex = block.number.sub(startBlock).div(EMISSION_REDUCTION_PERIOD_BLOCKS);
         if (currentIndex <= lastReductionPeriodIndex) {
