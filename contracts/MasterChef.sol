@@ -44,7 +44,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         IBEP20 lpToken;           // Address of LP token contract.
         uint256 allocPoint;       // How many allocation points assigned to this pool. BINGs to distribute per block.
         uint256 lastRewardBlock;  // Last block number that BINGs distribution occurs.
-        uint256 accSailPerShare;   // Accumulated BINGs per share, times 1e12. See below.
+        uint256 accBingPerShare;   // Accumulated BINGs per share, times 1e12. See below.
         uint16 depositFeeBP;      // Deposit fee in basis points
     }
 
@@ -143,14 +143,14 @@ contract MasterChef is Ownable, ReentrancyGuard {
     }
 
     // View function to see pending BINGs on frontend.
-    function pendingSail(uint256 _pid, address _user) external view returns (uint256) {
+    function pendingBing(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
         uint256 accBingPerShare = pool.accBingPerShare;
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (block.number > pool.lastRewardBlock && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-            uint256 sailReward = multiplier.mul(sailPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+            uint256 bingReward = multiplier.mul(bingPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
             accBingPerShare = accBingPerShare.add(bingReward.mul(1e12).div(lpSupply));
         }
         return user.amount.mul(accBingPerShare).div(1e12).sub(user.rewardDebt);
@@ -247,8 +247,8 @@ contract MasterChef is Ownable, ReentrancyGuard {
     }
 
     // Safe Bing transfer function, just in case if rounding error causes pool to not have enough BINGs.
-    function safeSailTransfer(address _to, uint256 _amount) internal {
-        uint256 sailBal = bing.balanceOf(address(this));
+    function safeBingTransfer(address _to, uint256 _amount) internal {
+        uint256 bingBal = bing.balanceOf(address(this));
         bool transferSuccess = false;
         if (_amount > sailBal) {
             transferSuccess = bing.transfer(_to, bingBal);
