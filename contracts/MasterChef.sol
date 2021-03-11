@@ -200,7 +200,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         }
         if (_amount > 0) {
             pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
-            if (address(pool.lpToken) == address(sail)) {
+            if (address(pool.lpToken) == address(bing)) {
                 uint256 transferTax = _amount.mul(2).div(100);
                 _amount = _amount.sub(transferTax);
             }
@@ -292,7 +292,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         massUpdatePools();
         lastReductionPeriodIndex = currentIndex;
         uint256 previousEmissionRate = bingPerBlock;
-        sailPerBlock = newEmissionRate;
+        bingPerBlock = newEmissionRate;
         emit EmissionRateUpdated(msg.sender, previousEmissionRate, newEmissionRate);
     }
 
